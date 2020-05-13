@@ -22,25 +22,27 @@ io.on('connection', (client) => {
         
         
         client.broadcast.to(data.sala).emit('listaPersonas', usuarios.getPersonasPorSala(data.sala));
+        client.broadcast.to(data.sala).emit('crearMensaje', crearMensaje('Administrador' , `${data.nombre} se unió el chat`));
 
         callback(usuarios.getPersonasPorSala(data.sala));
 
     });
 
 
-    client.on('crearMensaje', (data) => {
+    client.on('crearMensaje', (data, callback) => {
         let persona = usuarios.getPersona(client.id);
 
         let mensaje = crearMensaje(persona, data.mensaje);
-        client.broadcast.to(persona.sala).emit('crearMensaje', mensaje);
+        client.broadcast.to(persona.sala).emit('crearMensaje', mensaje);        
+        callback (mensaje);
     });
 
     client.on('disconnect', () => {
                
-        let personaBorada = usuarios.borarPersona( client.id);
-
-        client.broadcast.to(personaBorrada.sala).emit('crearMensaje', crearMensaje('Administrador' , `${personaBorada.nombre} abandonó el chat`));
-        client.broadcast.to(personaBorrada.sala).emit('listaPersonas', usuarios.getPersonasPorSala(personaBorada.sala));
+        let personaBorrada = usuarios.borarPersona( client.id);
+       
+        client.broadcast.to(personaBorrada.sala).emit('crearMensaje', crearMensaje('Administrador' , `${personaBorrada.nombre} abandonó el chat`));
+        client.broadcast.to(personaBorrada.sala).emit('listaPersonas', usuarios.getPersonasPorSala(personaBorrada.sala));
         
        
     });
